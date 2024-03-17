@@ -3,6 +3,16 @@ require 'json'
 COMPANIES_FILE_PATH = "companies.json"
 USERS_FILE_PATH = "users.json"
 
+
+#  This method is used to accept the path of a json file and parse its contents into an Array.
+#
+#  Parameters
+#  --
+#  - `file_path`: This is the path of the file that contains the json arrays.
+#
+#  Returns
+#  --
+#  The array parsed from the .json file.
 def read_json(file_path)
    unless File.exist?(file_path)
       raise StandardError, "File '#{file_path}' does not exist."
@@ -161,7 +171,7 @@ end
 def validate_companies(companies)
 
    unless companies.is_a?(Array)
-      raise StandardError, "#{COMPANIES_FILE_PATH} does not have a valid JSON array."
+      raise StandardError, "'#{COMPANIES_FILE_PATH}' does not have a valid JSON array."
    end
 
    for company in companies
@@ -174,7 +184,7 @@ def validate_companies(companies)
       company.each_pair do |key, value|
 
          unless legal_keys.include?(key)
-            raise StandardError, "JSON object for a company has illegal key: #{key}."
+            raise StandardError, "JSON object for a company has illegal key: `#{key}`."
          end
 
          illegal_key = ""
@@ -198,7 +208,7 @@ def validate_companies(companies)
          end
 
          unless illegal_key == ""
-            raise StandardError, "JSON object for company has key #{illegal_key} with illegal value."
+            raise StandardError, "JSON object for company has key '#{illegal_key}' with illegal value."
          end
 
       end
@@ -216,7 +226,7 @@ end
 def validate_users(users)
 
    unless users.is_a?(Array)
-      raise StandardError, "#{USERS_FILE_PATH} does not have a valid JSON array."
+      raise StandardError, "'#{USERS_FILE_PATH}' does not have a valid JSON array."
    end
 
    for user in users
@@ -229,7 +239,7 @@ def validate_users(users)
       user.each_pair do |key, value|
 
          unless legal_keys.include?(key)
-            raise StandardError, "JSON object for a user has illegal key: #{key}."
+            raise StandardError, "JSON object for a user has illegal key: '#{key}'."
          end
 
          illegal_key = ""
@@ -269,7 +279,7 @@ def validate_users(users)
          end
 
          unless illegal_key == ""
-            raise StandardError, "JSON object for user has key #{illegal_key} with illegal value."
+            raise StandardError, "JSON object for user has key '#{illegal_key}' with illegal value."
          end
       end
    end

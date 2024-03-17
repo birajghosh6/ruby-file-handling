@@ -49,5 +49,15 @@ ruby --version
     Open the `output.txt` file to view the processed data according to the specified criteria. The 
     code is written as per requirements set in the `challenge.txt` file.
 
+## Testing
+
+Unit tests are included to ensure the correctness of the script. You can run these tests using the following steps:
+
+1. **Run Unit Tests:**
+
+   Execute the unit tests by running the following command in your terminal:
+   ```
+   ruby challenge_test.rb
+   ```
 
 
