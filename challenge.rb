@@ -1,7 +1,7 @@
 require 'json'
 
 COMPANIES_FILE_PATH = "companies.json"
-USER_FILE_PATH = "users.json"
+USERS_FILE_PATH = "users.json"
 
 def read_json(file_path)
    unless File.exist?(file_path)
@@ -152,6 +152,130 @@ def write_company_details_to_file(companies_with_user_info)
 end
 
 
+#  This method is used to validate companies array and ensure that the entries in the JSON objects have the
+#  right data types.
+#
+#  Parameters
+#  --
+#  - `companies`: The json array of companies.
+def validate_companies(companies)
+
+   unless companies.is_a?(Array)
+      raise StandardError, "#{COMPANIES_FILE_PATH} does not have a valid JSON array."
+   end
+
+   for company in companies
+
+      unless company.is_a?(Hash)
+         raise StandardError, "company array does not have JSON objects."
+      end
+
+      legal_keys = ["id", "name", "top_up", "email_status"]
+      company.each_pair do |key, value|
+
+         unless legal_keys.include?(key)
+            raise StandardError, "JSON object for a company has illegal key: #{key}."
+         end
+
+         illegal_key = ""
+         case key
+         when "id"
+            unless value.is_a?(Integer)
+               illegal_key = "id"
+            end
+         when "name"
+            unless value.is_a?(String)
+               illegal_key = "name"
+            end
+         when "top_up"
+            unless value.is_a?(Integer)
+               illegal_key = "top_up"
+            end
+         when "email_status"
+            unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+               illegal_key = "email_status"
+            end
+         end
+
+         unless illegal_key == ""
+            raise StandardError, "JSON object for company has key #{illegal_key} with illegal value."
+         end
+
+      end
+
+   end
+end
+
+
+#  This method is used to validate users array and ensure that the entries in the JSON objects have the
+#  right data types.
+#
+#  Parameters
+#  --
+#  - `users`: The json array of users.
+def validate_users(users)
+
+   unless users.is_a?(Array)
+      raise StandardError, "#{USERS_FILE_PATH} does not have a valid JSON array."
+   end
+
+   for user in users
+
+      unless user.is_a?(Hash)
+         raise StandardError, "user array does not have JSON objects."
+      end
+
+      legal_keys = ["id", "first_name", "last_name", "email", "company_id", "email_status", "active_status", "tokens"]
+      user.each_pair do |key, value|
+
+         unless legal_keys.include?(key)
+            raise StandardError, "JSON object for a user has illegal key: #{key}."
+         end
+
+         illegal_key = ""
+         case key
+         when "id"
+            unless value.is_a?(Integer)
+               illegal_key = "id"
+            end
+         when "first_name"
+            unless value.is_a?(String)
+               illegal_key = "first_name"
+            end
+         when "last_name"
+            unless value.is_a?(String)
+               illegal_key = "last_name"
+            end
+         when "email"
+            unless value.is_a?(String)
+               illegal_key = "email"
+            end
+         when "company_id"
+            unless value.is_a?(Integer)
+               illegal_key = "company_id"
+            end
+         when "email_status"
+            unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+               illegal_key = "email_status"
+            end
+         when "active_status"
+            unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+               illegal_key = "active_status"
+            end
+         when "tokens"
+            unless value.is_a?(Integer)
+               illegal_key = "tokens"
+            end
+         end
+
+         unless illegal_key == ""
+            raise StandardError, "JSON object for user has key #{illegal_key} with illegal value."
+         end
+      end
+   end
+end
+
+
 #  This method is used to parse two json files, one for companies and one for users,
 #  and create a file output.txt which contains some calculated information based on the
 #  the two input files.
@@ -159,13 +283,15 @@ def process_json_files
 
    begin
       companies = read_json(COMPANIES_FILE_PATH)
+      validate_companies(companies)
       # ascending sort by id of each company.
       companies = companies.sort_by {|hash| hash["id"]}
       company_ids = companies.map { |company| company["id"] }
 
-      users = read_json(USER_FILE_PATH)
+      users = read_json(USERS_FILE_PATH)
+      validate_users(users)
       # filter out users for which there exists no company details
-      users = users.select { |user| company_ids.include?(user["company_id"]) }
+      users = users.select { |user| company_ids.include?(user["company_id"]) && user["active_status"] }
       # ascending sort by company_id for each user.
       users = users.sort_by {|user_hash| [user_hash["company_id"], user_hash["last_name"]]}
 
